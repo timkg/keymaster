@@ -264,8 +264,19 @@
   };
 
   // set the handlers globally on document
-  addEvent(document, 'keydown', function(event) { dispatch(event) }); // Passing _scope to a callback to ensure it remains the same by execution. Fixes #48
-  addEvent(document, 'keyup', clearModifier);
+  var prevKeyCode;
+  addEvent(document, 'keydown', function(event) {
+    if (event.keyCode === prevKeyCode) {
+      return;
+    }
+    prevKeyCode = event.keyCode;
+    dispatch(event)
+  }); // Passing _scope to a callback to ensure it remains the same by execution. Fixes #48
+
+  addEvent(document, 'keyup', function (event) {
+    prevKeyCode = null;
+    clearModifier(event);
+  });
 
   // reset modifiers to false whenever the window is (re)focused.
   addEvent(window, 'focus', resetModifiers);
